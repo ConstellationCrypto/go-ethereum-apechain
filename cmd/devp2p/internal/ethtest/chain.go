@@ -180,7 +180,20 @@ func (c *Chain) IncNonce(addr common.Address, amt uint64) {
 func (c *Chain) Balance(addr common.Address) *big.Int {
 	bal := new(big.Int)
 	if acc, ok := c.state[addr]; ok {
-		bal, _ = bal.SetString(acc.Balance, 10)
+		fixed := new(big.Int)
+		debt := new(big.Int)
+		if len(acc.Fixed) > 0 {
+			fixed.SetString(acc.Fixed, 10)
+		}
+		if len(acc.Debt) > 0 {
+			debt.SetString(acc.Debt, 10)
+		}
+		bal.Set(fixed)
+		if bal.Cmp(debt) > 0 {
+			bal.Sub(bal, debt)
+		} else {
+			bal.SetUint64(0)
+		}
 	}
 	return bal
 }

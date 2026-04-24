@@ -17,7 +17,6 @@
 package bintrie
 
 import (
-	"bytes"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -28,7 +27,6 @@ import (
 	"github.com/ethereum/go-ethereum/trie"
 	"github.com/ethereum/go-ethereum/trie/trienode"
 	"github.com/ethereum/go-ethereum/triedb/database"
-	"github.com/holiman/uint256"
 )
 
 var errInvalidRootType = errors.New("invalid root type")
@@ -106,55 +104,7 @@ func (t *BinaryTrie) GetWithHashedKey(key []byte) ([]byte, error) {
 
 // GetAccount returns the account information for the given address.
 func (t *BinaryTrie) GetAccount(addr common.Address) (*types.StateAccount, error) {
-	var (
-		values [][]byte
-		err    error
-		acc    = &types.StateAccount{}
-		key    = GetBinaryTreeKey(addr, zero[:])
-	)
-	switch r := t.root.(type) {
-	case *InternalNode:
-		values, err = r.GetValuesAtStem(key[:31], t.nodeResolver)
-	case *StemNode:
-		values = r.Values
-	case Empty:
-		return nil, nil
-	default:
-		// This will cover HashedNode but that should be fine since the
-		// root node should always be resolved.
-		return nil, errInvalidRootType
-	}
-	if err != nil {
-		return nil, fmt.Errorf("GetAccount (%x) error: %v", addr, err)
-	}
-
-	// The following code is required for the MPT->Binary conversion.
-	// An account can be partially migrated, where storage slots were moved to the binary
-	// but not yet the account. This means some account information as (header) storage slots
-	// are in the binary trie but basic account information must be read in the base tree (MPT).
-	// TODO: we can simplify this logic depending if the conversion is in progress or finished.
-	emptyAccount := true
-	for i := 0; values != nil && i <= CodeHashLeafKey && emptyAccount; i++ {
-		emptyAccount = emptyAccount && values[i] == nil
-	}
-	if emptyAccount {
-		return nil, nil
-	}
-
-	// If the account has been deleted, then values[10] will be 0 and not nil. If it has
-	// been recreated after that, then its code keccak will NOT be 0. So return `nil` if
-	// the nonce, and values[10], and code keccak is 0.
-	if bytes.Equal(values[BasicDataLeafKey], zero[:]) && len(values) > 10 && len(values[10]) > 0 && bytes.Equal(values[CodeHashLeafKey], zero[:]) {
-		return nil, nil
-	}
-
-	acc.Nonce = binary.BigEndian.Uint64(values[BasicDataLeafKey][BasicDataNonceOffset:])
-	var balance [16]byte
-	copy(balance[:], values[BasicDataLeafKey][BasicDataBalanceOffset:])
-	acc.Balance = new(uint256.Int).SetBytes(balance[:])
-	acc.CodeHash = values[CodeHashLeafKey]
-
-	return acc, nil
+	panic("binary trie unsupported")
 }
 
 // GetStorage returns the value for key stored in the trie. The value bytes must
@@ -166,30 +116,7 @@ func (t *BinaryTrie) GetStorage(addr common.Address, key []byte) ([]byte, error)
 
 // UpdateAccount updates the account information for the given address.
 func (t *BinaryTrie) UpdateAccount(addr common.Address, acc *types.StateAccount, codeLen int) error {
-	var (
-		err       error
-		basicData [32]byte
-		values    = make([][]byte, NodeWidth)
-		stem      = GetBinaryTreeKey(addr, zero[:])
-	)
-	binary.BigEndian.PutUint32(basicData[BasicDataCodeSizeOffset-1:], uint32(codeLen))
-	binary.BigEndian.PutUint64(basicData[BasicDataNonceOffset:], acc.Nonce)
-
-	// Because the balance is a max of 16 bytes, truncate
-	// the extra values. This happens in devmode, where
-	// 0xff**32 is allocated to the developer account.
-	balanceBytes := acc.Balance.Bytes()
-	// TODO: reduce the size of the allocation in devmode, then panic instead
-	// of truncating.
-	if len(balanceBytes) > 16 {
-		balanceBytes = balanceBytes[16:]
-	}
-	copy(basicData[32-len(balanceBytes):], balanceBytes[:])
-	values[BasicDataLeafKey] = basicData[:]
-	values[CodeHashLeafKey] = acc.CodeHash[:]
-
-	t.root, err = t.root.InsertValuesAtStem(stem, values, t.nodeResolver, 0)
-	return err
+	panic("binary trie unsupported")
 }
 
 // UpdateStem updates the values for the given stem key.
