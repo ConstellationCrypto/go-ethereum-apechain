@@ -631,6 +631,9 @@ func (evm *EVM) create(caller common.Address, code []byte, gas uint64, value *ui
 	}
 	evm.Context.Transfer(evm.StateDB, caller, address, value)
 
+	// Contracts are initialized with yield disabled.
+	evm.StateDB.SetFlags(address, types.YieldDisabled, nil)
+
 	// Initialise a new contract and set the code that is to be used by the EVM.
 	// The contract is a scoped environment for this execution context only.
 	contract := NewContract(caller, address, value, gas, evm.jumpDests)

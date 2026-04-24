@@ -174,7 +174,11 @@ func (r *flatReader) Account(addr common.Address) (*types.StateAccount, error) {
 	}
 	acct := &types.StateAccount{
 		Nonce:    account.Nonce,
-		Balance:  account.Balance,
+		Flags:    account.Flags,
+		Fixed:    account.Fixed,
+		Shares:   account.Shares,
+		Debt:     account.Debt,
+		Delegate: account.Delegate,
 		CodeHash: account.CodeHash,
 		Root:     common.BytesToHash(account.Root),
 	}

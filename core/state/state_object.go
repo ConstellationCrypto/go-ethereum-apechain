@@ -89,7 +89,12 @@ type stateObject struct {
 
 // empty returns whether the account is considered empty.
 func (s *stateObject) empty() bool {
-	return s.data.Nonce == 0 && s.data.Balance.IsZero() && bytes.Equal(s.data.CodeHash, types.EmptyCodeHash.Bytes())
+	return s.data.Nonce == 0 && s.yieldFieldsEmpty() && bytes.Equal(s.data.CodeHash, types.EmptyCodeHash.Bytes())
+}
+
+func (s *stateObject) yieldFieldsEmpty() bool {
+	return s.data.Flags == 0 && s.data.Fixed.IsZero() && s.data.Shares.IsZero() &&
+		s.data.Debt.IsZero() && s.data.Delegate == (common.Address{})
 }
 
 // newObject creates a state object.
@@ -471,16 +476,149 @@ func (s *stateObject) AddBalance(amount *uint256.Int) uint256.Int {
 	return s.SetBalance(new(uint256.Int).Add(s.Balance(), amount))
 }
 
+func computeSharesAndRemainder(sharePrice uint64, value *uint256.Int) (*uint256.Int, *uint256.Int) {
+	return new(uint256.Int).DivMod(value, uint256.NewInt(sharePrice), new(uint256.Int))
+}
+
+func (s *stateObject) computeShareValue(sharePrice uint64) *uint256.Int {
+	value := uint256.NewInt(sharePrice)
+	value.Mul(value, s.data.Shares)
+	value.Add(value, s.data.Fixed)
+	return value
+}
+
 // SetBalance sets the balance for the object, and returns the previous balance.
 func (s *stateObject) SetBalance(amount *uint256.Int) uint256.Int {
-	prev := *s.data.Balance
-	s.db.journal.balanceChange(s.address, s.data.Balance)
-	s.setBalance(amount)
+	prev := *s.Balance()
+	s.db.journal.balanceChange(s.address, s.data.Fixed, s.data.Shares)
+
+	// Add Debt back to get the gross amount, then split according to the
+	// account's yield mode. Debt is tracked separately and subtracted
+	// when Balance() is read.
+	amount = new(uint256.Int).Add(amount, s.data.Debt)
+
+	var fixed, shares *uint256.Int
+	switch s.data.Flags {
+	case types.YieldAutomatic:
+		shares, fixed = computeSharesAndRemainder(s.db.GetSharePrice(), amount)
+	case types.YieldDelegated:
+		// Notify the delegate of the balance change so its debt stays consistent.
+		if delta := new(uint256.Int).Sub(amount, s.data.Fixed); !delta.IsZero() {
+			s.db.getOrNewStateObject(s.data.Delegate).adjustDebt(delta)
+		}
+		fallthrough // YieldDelegated stores like YieldDisabled
+	case types.YieldDisabled:
+		fixed = amount
+		shares = new(uint256.Int)
+	}
+
+	s.db.adjustShareCount(s.data.Shares, shares)
+	s.data.Fixed = fixed
+	s.data.Shares = shares
 	return prev
 }
 
-func (s *stateObject) setBalance(amount *uint256.Int) {
-	s.data.Balance = amount
+func (s *stateObject) adjustDebt(value *uint256.Int) {
+	prevShares := s.data.Shares.Clone()
+	s.db.journal.append(debtChange{
+		account:    s.address,
+		prevFixed:  s.data.Fixed.Clone(),
+		prevShares: prevShares,
+		prevDebt:   s.data.Debt.Clone(),
+	})
+	// Hack from the original fork (was marked as TODO to fix). Self-destruction
+	// can zero an account's shares without unwinding the delegation debt those
+	// shares backed. If the incoming delta (value) would push Debt negative
+	// (checked via two's complement Sign()), clamp value to -Debt so the
+	// resulting Debt is exactly zero instead of wrapping.
+	if new(uint256.Int).Add(value, s.data.Debt).Sign() < 0 {
+		value.Neg(s.data.Debt)
+	}
+	s.data.Fixed.Add(s.data.Fixed, value)
+	if s.data.Flags == types.YieldAutomatic {
+		amount := s.computeShareValue(s.db.GetSharePrice())
+		if amount.Sign() < 0 {
+			panic("err: underflow detected in amount")
+		}
+		s.data.Shares, s.data.Fixed = computeSharesAndRemainder(s.db.GetSharePrice(), amount)
+		s.db.adjustShareCount(prevShares, s.data.Shares)
+	} else {
+		if s.data.Fixed.Sign() < 0 {
+			panic("err: underflow detected in fixed")
+		}
+	}
+	s.data.Debt.Add(s.data.Debt, value)
+}
+
+func (s *stateObject) SetFlags(flags uint8, delegate *common.Address) {
+	if s.selfDestructed && flags != types.YieldDisabled {
+		return
+	}
+	if flags == types.YieldDelegated && (delegate == nil || *delegate == s.address) {
+		return
+	}
+	if flags == s.data.Flags {
+		if flags == types.YieldDelegated {
+			if *delegate == s.data.Delegate {
+				return
+			}
+		} else {
+			return
+		}
+	}
+
+	// Compute the current gross value under the old flag
+	var value *uint256.Int
+	switch s.data.Flags {
+	case types.YieldAutomatic:
+		value = s.computeShareValue(s.db.GetSharePrice())
+	case types.YieldDelegated:
+		balance := new(uint256.Int).Sub(s.data.Fixed, s.data.Debt)
+		if balance.Sign() < 0 {
+			panic("assertion failed: balance is negative")
+		}
+		if balance.Sign() > 0 {
+			balance.Neg(balance)
+			s.db.getOrNewStateObject(s.data.Delegate).adjustDebt(balance)
+		}
+		fallthrough // YieldDelegated reads like YieldDisabled
+	case types.YieldDisabled:
+		value = s.data.Fixed.Clone()
+	}
+
+	s.db.journal.append(flagChange{
+		account:      s.address,
+		prevFlags:    s.data.Flags,
+		prevFixed:    s.data.Fixed.Clone(),
+		prevShares:   s.data.Shares.Clone(),
+		prevDelegate: s.data.Delegate,
+	})
+
+	// Re-split the value under the new flag
+	var fixed, shares *uint256.Int
+	switch flags {
+	case types.YieldAutomatic:
+		shares, fixed = computeSharesAndRemainder(s.db.GetSharePrice(), value)
+		s.data.Delegate = common.Address{}
+	case types.YieldDisabled:
+		shares, fixed = new(uint256.Int), value
+		s.data.Delegate = common.Address{}
+	case types.YieldDelegated:
+		shares, fixed = new(uint256.Int), value
+		s.data.Delegate = *delegate
+		balance := new(uint256.Int).Sub(value, s.data.Debt)
+		if balance.Sign() < 0 {
+			panic("assertion failed: new balance is negative")
+		}
+		if balance.Sign() > 0 {
+			s.db.getOrNewStateObject(*delegate).adjustDebt(balance)
+		}
+	}
+
+	s.db.adjustShareCount(s.data.Shares, shares)
+	s.data.Flags = flags
+	s.data.Fixed = fixed
+	s.data.Shares = shares
 }
 
 func (s *stateObject) deepCopy(db *StateDB) *stateObject {
@@ -592,7 +730,20 @@ func (s *stateObject) CodeHash() []byte {
 }
 
 func (s *stateObject) Balance() *uint256.Int {
-	return s.data.Balance
+	var balance *uint256.Int
+	if s.data.Flags == types.YieldAutomatic {
+		balance = s.computeShareValue(s.db.GetSharePrice())
+	} else {
+		balance = s.data.Fixed.Clone()
+	}
+	if balance.Cmp(s.data.Debt) < 0 {
+		panic("negative balance not allowed")
+	}
+	return balance.Sub(balance, s.data.Debt)
+}
+
+func (s *stateObject) Flags() uint8 {
+	return s.data.Flags
 }
 
 func (s *stateObject) Nonce() uint64 {
