@@ -476,6 +476,9 @@ func (s *stateObject) AddBalance(amount *uint256.Int) uint256.Int {
 }
 
 func computeSharesAndRemainder(sharePrice uint64, value *uint256.Int) (*uint256.Int, *uint256.Int) {
+	if sharePrice == 0 {
+		return new(uint256.Int), new(uint256.Int).Set(value)
+	}
 	return new(uint256.Int).DivMod(value, uint256.NewInt(sharePrice), new(uint256.Int))
 }
 
