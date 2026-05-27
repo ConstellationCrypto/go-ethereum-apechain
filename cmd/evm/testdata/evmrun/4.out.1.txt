@@ -1,8 +1,12 @@
 {
-    "root": "b444481d1367188172f8c6091e948aaa68bae763fd26d6b9e994306a66bf69f9",
+    "root": "c176087052e5d5e0581318187ee421667342b4b5d5aeddf509fd34ab0f25e8fa",
     "accounts": {
         "0x0000000000000000000000007265636569766572": {
-            "balance": "0",
+            "flags": 0,
+            "fixed": "0",
+            "shares": "0",
+            "debt": "0",
+            "delegate": "0x0000000000000000000000000000000000000000",
             "nonce": 0,
             "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
             "codeHash": "0x3e48ef54b89079a075f3b8fc253c657a86b110a7aed3568c1517b10edf2c3eb6",

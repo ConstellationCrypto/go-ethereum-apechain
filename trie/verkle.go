@@ -82,30 +82,7 @@ func (t *VerkleTrie) GetKey(key []byte) []byte {
 // account address. If the specified account is not in the verkle tree, nil will
 // be returned. If the tree is corrupted, an error will be returned.
 func (t *VerkleTrie) GetAccount(addr common.Address) (*types.StateAccount, error) {
-	var (
-		acc    = &types.StateAccount{}
-		values [][]byte
-		err    error
-	)
-	switch n := t.root.(type) {
-	case *verkle.InternalNode:
-		values, err = n.GetValuesAtStem(t.cache.GetStem(addr[:]), t.nodeResolver)
-		if err != nil {
-			return nil, fmt.Errorf("GetAccount (%x) error: %v", addr, err)
-		}
-	default:
-		return nil, errInvalidRootType
-	}
-	if values == nil {
-		return nil, nil
-	}
-	basicData := values[utils.BasicDataLeafKey]
-	acc.Nonce = binary.BigEndian.Uint64(basicData[utils.BasicDataNonceOffset:])
-	acc.Balance = new(uint256.Int).SetBytes(basicData[utils.BasicDataBalanceOffset : utils.BasicDataBalanceOffset+16])
-	acc.CodeHash = values[utils.CodeHashLeafKey]
-
-	// TODO account.Root is leave as empty. How should we handle the legacy account?
-	return acc, nil
+	panic("verkle trie unsupported")
 }
 
 // PrefetchAccount attempts to resolve specific accounts from the database
@@ -145,36 +122,7 @@ func (t *VerkleTrie) PrefetchStorage(addr common.Address, keys [][]byte) error {
 // UpdateAccount implements state.Trie, writing the provided account into the tree.
 // If the tree is corrupted, an error will be returned.
 func (t *VerkleTrie) UpdateAccount(addr common.Address, acc *types.StateAccount, codeLen int) error {
-	var (
-		err       error
-		basicData [32]byte
-		values    = make([][]byte, verkle.NodeWidth)
-		stem      = t.cache.GetStem(addr[:])
-	)
-
-	// Code size is encoded in BasicData as a 3-byte big-endian integer. Spare bytes are present
-	// before the code size to support bigger integers in the future. PutUint32(...) requires
-	// 4 bytes, so we need to shift the offset 1 byte to the left.
-	binary.BigEndian.PutUint32(basicData[utils.BasicDataCodeSizeOffset-1:], uint32(codeLen))
-	binary.BigEndian.PutUint64(basicData[utils.BasicDataNonceOffset:], acc.Nonce)
-	if acc.Balance.ByteLen() > 16 {
-		panic("balance too large")
-	}
-	acc.Balance.WriteToSlice(basicData[utils.BasicDataBalanceOffset : utils.BasicDataBalanceOffset+16])
-	values[utils.BasicDataLeafKey] = basicData[:]
-	values[utils.CodeHashLeafKey] = acc.CodeHash[:]
-
-	switch root := t.root.(type) {
-	case *verkle.InternalNode:
-		err = root.InsertValuesAtStem(stem, values, t.nodeResolver)
-	default:
-		return errInvalidRootType
-	}
-	if err != nil {
-		return fmt.Errorf("UpdateAccount (%x) error: %v", addr, err)
-	}
-
-	return nil
+	panic("verkle trie unsupported")
 }
 
 // UpdateStorage implements state.Trie, writing the provided storage slot into

@@ -380,6 +380,18 @@ func (s *hookedStateDB) ExpectBalanceMint(b *big.Int) {
 	s.inner.ExpectBalanceMint(b)
 }
 
+func (s *hookedStateDB) GetFlags(addr common.Address) uint8 {
+	return s.inner.GetFlags(addr)
+}
+
+func (s *hookedStateDB) SetFlags(addr common.Address, flags uint8, delegate *common.Address) {
+	s.inner.SetFlags(addr, flags, delegate)
+}
+
+func (s *hookedStateDB) GetBalanceValues(addr common.Address) *BalanceValues {
+	return s.inner.GetBalanceValues(addr)
+}
+
 func (s *hookedStateDB) GetSelfDestructs() []common.Address {
 	return s.inner.GetSelfDestructs()
 }

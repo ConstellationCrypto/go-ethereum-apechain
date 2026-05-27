@@ -795,7 +795,7 @@ func inspectAccount(db *triedb.Database, start uint64, end uint64, address commo
 				if len(account.Root) > 0 {
 					root = fmt.Sprintf("%#x", account.Root)
 				}
-				content = fmt.Sprintf("nonce: %d, balance: %d, codeHash: %s, root: %s", account.Nonce, account.Balance, code, root)
+				content = fmt.Sprintf("nonce: %d, fixed: %d, shares: %d, debt: %d, codeHash: %s, root: %s", account.Nonce, account.Fixed, account.Shares, account.Debt, code, root)
 			}
 		}
 		fmt.Printf("#%d - #%d: %s\n", from, stats.Blocks[i], content)

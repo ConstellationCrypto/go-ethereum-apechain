@@ -116,7 +116,7 @@ func TestSupplyGenesisAlloc(t *testing.T) {
 			GenesisAlloc: (*hexutil.Big)(new(big.Int).Mul(common.Big2, big.NewInt(params.Ether))),
 		},
 		Number:     0,
-		Hash:       common.HexToHash("0xbcc9466e9fc6a8b56f4b29ca353a421ff8b51a0c1a58ca4743b427605b08f2ca"),
+		Hash:       common.HexToHash("0x3d2d9e318f7c37f99bdfbf3fded011bf2ef31e70e34c54cb58376c45fe651f61"),
 		ParentHash: common.HexToHash("0x0000000000000000000000000000000000000000000000000000000000000000"),
 	}
 
@@ -144,7 +144,7 @@ func TestSupplyRewards(t *testing.T) {
 			Reward: (*hexutil.Big)(new(big.Int).Mul(common.Big2, big.NewInt(params.Ether))),
 		},
 		Number:     1,
-		Hash:       common.HexToHash("0xcbb08370505be503dafedc4e96d139ea27aba3cbc580148568b8a307b3f51052"),
+		Hash:       common.HexToHash("0x0dcbbe9428470521d10a97c0d34b3d7a5bebab20059a5039a55424b83fd82d80"),
 		ParentHash: common.HexToHash("0xadeda0a83e337b6c073e3f0e9a17531a04009b397a9588c093b628f21b8bc5a3"),
 	}
 
@@ -182,8 +182,8 @@ func TestSupplyRewardsWithUncle(t *testing.T) {
 			Reward: (*hexutil.Big)(totalReward),
 		},
 		Number:     3,
-		Hash:       common.HexToHash("0x0737d31f8671c18d32b5143833cfa600e4264df62324c9de569668c6de9eed6d"),
-		ParentHash: common.HexToHash("0x45af6557df87719cb3c7e6f8a98b61508ea74a797733191aececb4c2ec802447"),
+		Hash:       common.HexToHash("0x9df7f17ae449ab0187fe6f23c671f34ba6feef2ff2d91e723de2dafd24dae4b4"),
+		ParentHash: common.HexToHash("0xf91411451cd29c0f6a7092e06ab25d0c26575b87cdce35b2c94cea70e9762e8a"),
 	}
 
 	// Generate a new chain where block 3 includes an uncle

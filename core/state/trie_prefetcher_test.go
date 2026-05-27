@@ -67,6 +67,7 @@ func TestUseAfterTerminate(t *testing.T) {
 }
 
 func TestVerklePrefetcher(t *testing.T) {
+	t.Skip("ApeChain: verkle trie support removed")
 	disk := rawdb.NewMemoryDatabase()
 	db := triedb.NewDatabase(disk, triedb.VerkleDefaults)
 	sdb := NewDatabase(db, nil)

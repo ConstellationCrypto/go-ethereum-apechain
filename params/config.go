@@ -28,10 +28,10 @@ import (
 
 // Genesis hashes to enforce below configs on.
 var (
-	MainnetGenesisHash = common.HexToHash("0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3")
-	HoleskyGenesisHash = common.HexToHash("0xb5f7f912443c940f21fd611f12828d75b534364ed9e95ca4e307729a4661bde4")
-	SepoliaGenesisHash = common.HexToHash("0x25a5cc106eea7138acab33231d7160d69cb777ee0c2c553fcddf5138993e6dd9")
-	HoodiGenesisHash   = common.HexToHash("0xbbe312868b376a3001692a646dd2d7d1e4406380dfd86b98aa8a34d1557c971b")
+	MainnetGenesisHash = common.HexToHash("0xa77f374e44e565cca32879c5a40440ee46b4ff7c2c6b1776afd7254275ba54c4")
+	HoleskyGenesisHash = common.HexToHash("0x8cc4cd63f17aea9aad5a7e1f03ade1d74c5dea0c2a3074e3d032f618498f0a57")
+	SepoliaGenesisHash = common.HexToHash("0x08cb123c3acdf0f51092c22a63800450a0d30a35ff805c9ebdc2736520c3bd3f")
+	HoodiGenesisHash   = common.HexToHash("0x4175126627adef65243b3b9c06ef29246edd49fc6632036bca5cd1d96fb660aa")
 )
 
 func newUint64(val uint64) *uint64 { return &val }
