@@ -40,13 +40,17 @@ func newTestDatabase(diskdb ethdb.Database, scheme string) *triedb.Database {
 }
 
 func TestBinaryIterator(t *testing.T) {
+	t.Skip("ApeChain: binary trie support removed")
 	trie, err := NewBinaryTrie(types.EmptyVerkleHash, newTestDatabase(rawdb.NewMemoryDatabase(), rawdb.PathScheme))
 	if err != nil {
 		t.Fatal(err)
 	}
 	account0 := &types.StateAccount{
 		Nonce:    1,
-		Balance:  uint256.NewInt(2),
+		Flags:    types.YieldDisabled,
+		Fixed:    uint256.NewInt(2),
+		Shares:   new(uint256.Int),
+		Debt:     new(uint256.Int),
 		Root:     types.EmptyRootHash,
 		CodeHash: nil,
 	}
@@ -55,7 +59,10 @@ func TestBinaryIterator(t *testing.T) {
 	trie.UpdateAccount(common.Address{}, account0, 0)
 	account1 := &types.StateAccount{
 		Nonce:    1337,
-		Balance:  uint256.NewInt(2000),
+		Flags:    types.YieldDisabled,
+		Fixed:    uint256.NewInt(2000),
+		Shares:   new(uint256.Int),
+		Debt:     new(uint256.Int),
 		Root:     types.EmptyRootHash,
 		CodeHash: nil,
 	}

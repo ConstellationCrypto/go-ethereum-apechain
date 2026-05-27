@@ -18,7 +18,6 @@ package bintrie
 
 import (
 	"encoding/binary"
-	"errors"
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -28,8 +27,6 @@ import (
 	"github.com/ethereum/go-ethereum/trie/trienode"
 	"github.com/ethereum/go-ethereum/triedb/database"
 )
-
-var errInvalidRootType = errors.New("invalid root type")
 
 // NewBinaryNode creates a new empty binary trie
 func NewBinaryNode() BinaryNode {

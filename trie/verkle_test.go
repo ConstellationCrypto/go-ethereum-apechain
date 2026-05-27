@@ -33,12 +33,18 @@ var (
 	accounts = map[common.Address]*types.StateAccount{
 		{1}: {
 			Nonce:    100,
-			Balance:  uint256.NewInt(100),
+			Flags:    types.YieldDisabled,
+			Fixed:    uint256.NewInt(100),
+			Shares:   new(uint256.Int),
+			Debt:     new(uint256.Int),
 			CodeHash: common.Hash{0x1}.Bytes(),
 		},
 		{2}: {
 			Nonce:    200,
-			Balance:  uint256.NewInt(200),
+			Flags:    types.YieldDisabled,
+			Fixed:    uint256.NewInt(200),
+			Shares:   new(uint256.Int),
+			Debt:     new(uint256.Int),
 			CodeHash: common.Hash{0x2}.Bytes(),
 		},
 	}
@@ -57,6 +63,7 @@ var (
 )
 
 func TestVerkleTreeReadWrite(t *testing.T) {
+	t.Skip("ApeChain: verkle trie support removed")
 	db := newTestDatabase(rawdb.NewMemoryDatabase(), rawdb.PathScheme)
 	tr, _ := NewVerkleTrie(types.EmptyVerkleHash, db, utils.NewPointCache(100))
 
@@ -92,6 +99,7 @@ func TestVerkleTreeReadWrite(t *testing.T) {
 }
 
 func TestVerkleRollBack(t *testing.T) {
+	t.Skip("ApeChain: verkle trie support removed")
 	db := newTestDatabase(rawdb.NewMemoryDatabase(), rawdb.PathScheme)
 	tr, _ := NewVerkleTrie(types.EmptyVerkleHash, db, utils.NewPointCache(100))
 

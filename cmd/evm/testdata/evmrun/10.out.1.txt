@@ -2,9 +2,9 @@
   \{
     "name": "00000006-naivefuzz-0",
     "pass": false,
-    "stateRoot": "0xad1024c87b5548e77c937aa50f72b6cb620d278f4dd79bae7f78f71ff75af458",
+    "stateRoot": "0xb3408b1889f1833725e19b5e23f3e0b0ebf90a33d2d5eab43aea0f10748951f7",
     "fork": "London",
-    "error": "post state root mismatch: got ad1024c87b5548e77c937aa50f72b6cb620d278f4dd79bae7f78f71ff75af458, want 0000000000000000000000000000000000000000000000000000000000000000",
+    "error": "post state root mismatch: got b3408b1889f1833725e19b5e23f3e0b0ebf90a33d2d5eab43aea0f10748951f7, want 0000000000000000000000000000000000000000000000000000000000000000",
     "benchStats": \{
       "time": \d+,
       "allocs": \d+,

@@ -76,6 +76,7 @@ func TestBlockchain(t *testing.T) {
 
 // TestExecutionSpecBlocktests runs the test fixtures from execution-spec-tests.
 func TestExecutionSpecBlocktests(t *testing.T) {
+	t.Skip("ApeChain: execution spec fixtures use vanilla StateAccount format")
 	if !common.FileExist(executionSpecBlockchainTestDir) {
 		t.Skipf("directory %s does not exist", executionSpecBlockchainTestDir)
 	}

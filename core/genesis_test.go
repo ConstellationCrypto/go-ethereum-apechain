@@ -41,7 +41,7 @@ func TestSetupGenesis(t *testing.T) {
 
 func testSetupGenesis(t *testing.T, scheme string) {
 	var (
-		customghash = common.HexToHash("0x89c99d90b79719238d2645c7642f2c9295246e80775b38cfd162b696817fbd50")
+		customghash = common.HexToHash("0xce88e63a5ee3e2214321ce670163a7a92a67c38dfb03676b34b87a87de05cd6b")
 		customg     = Genesis{
 			Config: &params.ChainConfig{HomesteadBlock: big.NewInt(3), Ethash: &params.EthashConfig{}},
 			Alloc: types.GenesisAlloc{
@@ -262,6 +262,7 @@ func newDbConfig(scheme string) *triedb.Config {
 }
 
 func TestVerkleGenesisCommit(t *testing.T) {
+	t.Skip("ApeChain: verkle trie support removed")
 	var verkleTime uint64 = 0
 	verkleConfig := &params.ChainConfig{
 		ChainID:                 big.NewInt(1),
