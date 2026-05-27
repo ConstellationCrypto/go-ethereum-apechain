@@ -1499,8 +1499,8 @@ func makeAccountTrieNoStorage(n int, scheme string) (string, *trie.Trie, []*kv) 
 	)
 	for i := uint64(1); i <= uint64(n); i++ {
 		value, _ := rlp.EncodeToBytes(&types.StateAccount{
-			Nonce:    i,
-			Balance:  uint256.NewInt(i),
+			Nonce: i,
+			Flags: types.YieldDisabled, Fixed: uint256.NewInt(i), Shares: new(uint256.Int), Debt: new(uint256.Int),
 			Root:     types.EmptyRootHash,
 			CodeHash: getCodeHash(i),
 		})
@@ -1550,8 +1550,8 @@ func makeBoundaryAccountTrie(scheme string, n int) (string, *trie.Trie, []*kv) {
 	// Fill boundary accounts
 	for i := 0; i < len(boundaries); i++ {
 		value, _ := rlp.EncodeToBytes(&types.StateAccount{
-			Nonce:    uint64(0),
-			Balance:  uint256.NewInt(uint64(i)),
+			Nonce: uint64(0),
+			Flags: types.YieldDisabled, Fixed: uint256.NewInt(uint64(i)), Shares: new(uint256.Int), Debt: new(uint256.Int),
 			Root:     types.EmptyRootHash,
 			CodeHash: getCodeHash(uint64(i)),
 		})
@@ -1562,8 +1562,8 @@ func makeBoundaryAccountTrie(scheme string, n int) (string, *trie.Trie, []*kv) {
 	// Fill other accounts if required
 	for i := uint64(1); i <= uint64(n); i++ {
 		value, _ := rlp.EncodeToBytes(&types.StateAccount{
-			Nonce:    i,
-			Balance:  uint256.NewInt(i),
+			Nonce: i,
+			Flags: types.YieldDisabled, Fixed: uint256.NewInt(i), Shares: new(uint256.Int), Debt: new(uint256.Int),
 			Root:     types.EmptyRootHash,
 			CodeHash: getCodeHash(i),
 		})
@@ -1606,8 +1606,8 @@ func makeAccountTrieWithStorageWithUniqueStorage(scheme string, accounts, slots 
 		nodes.Merge(stNodes)
 
 		value, _ := rlp.EncodeToBytes(&types.StateAccount{
-			Nonce:    i,
-			Balance:  uint256.NewInt(i),
+			Nonce: i,
+			Flags: types.YieldDisabled, Fixed: uint256.NewInt(i), Shares: new(uint256.Int), Debt: new(uint256.Int),
 			Root:     stRoot,
 			CodeHash: codehash,
 		})
@@ -1672,8 +1672,8 @@ func makeAccountTrieWithStorage(scheme string, accounts, slots int, code, bounda
 		nodes.Merge(stNodes)
 
 		value, _ := rlp.EncodeToBytes(&types.StateAccount{
-			Nonce:    i,
-			Balance:  uint256.NewInt(i),
+			Nonce: i,
+			Flags: types.YieldDisabled, Fixed: uint256.NewInt(i), Shares: new(uint256.Int), Debt: new(uint256.Int),
 			Root:     stRoot,
 			CodeHash: codehash,
 		})
@@ -1829,7 +1829,11 @@ func verifyTrie(scheme string, db ethdb.KeyValueStore, root common.Hash, t *test
 	for accIt.Next() {
 		var acc struct {
 			Nonce    uint64
-			Balance  *big.Int
+			Flags    uint8
+			Fixed    *big.Int
+			Shares   *big.Int
+			Debt     *big.Int
+			Delegate common.Address
 			Root     common.Hash
 			CodeHash []byte
 		}

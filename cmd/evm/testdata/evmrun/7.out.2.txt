@@ -922,4 +922,4 @@ Post-execution info:
   - output: ``
   - consumed gas: `732781`
   - error: `<nil>`
-{"stateRoot": "0xad1024c87b5548e77c937aa50f72b6cb620d278f4dd79bae7f78f71ff75af458"}
+{"stateRoot": "0xb3408b1889f1833725e19b5e23f3e0b0ebf90a33d2d5eab43aea0f10748951f7"}

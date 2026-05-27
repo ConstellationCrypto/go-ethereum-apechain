@@ -16,7 +16,7 @@
     }
   },
   "result": {
-    "stateRoot": "0xa40cb3fab01848e922a48bd24191815df9f721ad4b60376edac75161517663e8",
+    "stateRoot": "0xe4944df41c27b6526fb89d272101d290b4558d8e94b556b76db449c228b12ea2",
     "txRoot": "0x4409cc4b699384ba5f8248d92b784713610c5ff9c1de51e9239da0dac76de9ce",
     "receiptsRoot": "0xbff643da765981266133094092d98c81d2ac8e9a83a7bbda46c3d736f1f874ac",
     "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",

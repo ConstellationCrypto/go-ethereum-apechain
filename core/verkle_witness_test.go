@@ -91,6 +91,7 @@ var (
 )
 
 func TestProcessVerkle(t *testing.T) {
+	t.Skip("ApeChain: verkle trie support removed")
 	var (
 		code                            = common.FromHex(`6060604052600a8060106000396000f360606040526008565b00`)
 		intrinsicContractCreationGas, _ = IntrinsicGas(code, nil, nil, true, true, true, true)
@@ -258,6 +259,7 @@ func TestProcessParentBlockHash(t *testing.T) {
 		checkBlockHashes(statedb, false)
 	})
 	t.Run("Verkle", func(t *testing.T) {
+		t.Skip("ApeChain: verkle trie support removed")
 		db := rawdb.NewMemoryDatabase()
 		cacheConfig := DefaultConfig().WithStateScheme(rawdb.PathScheme)
 		cacheConfig.SnapshotLimit = 0
@@ -280,6 +282,7 @@ func getContractStoredBlockHash(statedb *state.StateDB, number uint64, isVerkle 
 
 // TestProcessVerkleInvalidContractCreation checks for several modes of contract creation failures
 func TestProcessVerkleInvalidContractCreation(t *testing.T) {
+	t.Skip("ApeChain: verkle trie support removed")
 	var (
 		account1 = common.HexToAddress("0x687704DB07e902e9A8B3754031D168D46E3D586e")
 		account2 = common.HexToAddress("0x6177843db3138ae69679A54b95cf345ED759450d")
@@ -453,6 +456,7 @@ func verkleTestGenesis(config *params.ChainConfig) *Genesis {
 // TestProcessVerkleContractWithEmptyCode checks that the witness contains all valid
 // entries, if the initcode returns an empty code.
 func TestProcessVerkleContractWithEmptyCode(t *testing.T) {
+	t.Skip("ApeChain: verkle trie support removed")
 	// The test txs were taken from a secondary testnet with chain id 69421
 	config := *testKaustinenLikeChainConfig
 	config.ChainID.SetUint64(69421)
@@ -509,6 +513,7 @@ func TestProcessVerkleContractWithEmptyCode(t *testing.T) {
 // TestProcessVerkleExtCodeHashOpcode verifies that calling EXTCODEHASH on another
 // deployed contract, creates all the right entries in the witness.
 func TestProcessVerkleExtCodeHashOpcode(t *testing.T) {
+	t.Skip("ApeChain: verkle trie support removed")
 	// The test txs were taken from a secondary testnet with chain id 69421
 	config := *testKaustinenLikeChainConfig
 	config.ChainID.SetUint64(69421)
@@ -613,6 +618,7 @@ func TestProcessVerkleExtCodeHashOpcode(t *testing.T) {
 // TestProcessVerkleBalanceOpcode checks that calling balance
 // on another contract will add the correct entries to the witness.
 func TestProcessVerkleBalanceOpcode(t *testing.T) {
+	t.Skip("ApeChain: verkle trie support removed")
 	// The test txs were taken from a secondary testnet with chain id 69421
 	config := *testKaustinenLikeChainConfig
 	config.ChainID.SetUint64(69421)
@@ -670,6 +676,7 @@ func TestProcessVerkleBalanceOpcode(t *testing.T) {
 // TestProcessVerkleSelfDestructInSeparateTx controls the contents of the witness after
 // a non-eip6780-compliant selfdestruct occurs.
 func TestProcessVerkleSelfDestructInSeparateTx(t *testing.T) {
+	t.Skip("ApeChain: verkle trie support removed")
 	// The test txs were taken from a secondary testnet with chain id 69421
 	config := *testKaustinenLikeChainConfig
 	config.ChainID.SetUint64(69421)
@@ -790,6 +797,7 @@ func TestProcessVerkleSelfDestructInSeparateTx(t *testing.T) {
 // TestProcessVerkleSelfDestructInSameTx controls the contents of the witness after
 // a eip6780-compliant selfdestruct occurs.
 func TestProcessVerkleSelfDestructInSameTx(t *testing.T) {
+	t.Skip("ApeChain: verkle trie support removed")
 	// The test txs were taken from a secondary testnet with chain id 69421
 	config := *testKaustinenLikeChainConfig
 	config.ChainID.SetUint64(69421)
@@ -886,6 +894,7 @@ func TestProcessVerkleSelfDestructInSameTx(t *testing.T) {
 // if a selfdestruct occurs in a different tx than the one that created it, but the beneficiary
 // is the selfdestructed account.
 func TestProcessVerkleSelfDestructInSeparateTxWithSelfBeneficiary(t *testing.T) {
+	t.Skip("ApeChain: verkle trie support removed")
 	// The test txs were taken from a secondary testnet with chain id 69421
 	config := *testKaustinenLikeChainConfig
 	config.ChainID.SetUint64(69421)
@@ -976,6 +985,7 @@ func TestProcessVerkleSelfDestructInSeparateTxWithSelfBeneficiary(t *testing.T) 
 // if a selfdestruct occurs in the same tx as the one that created it, but the beneficiary
 // is the selfdestructed account.
 func TestProcessVerkleSelfDestructInSameTxWithSelfBeneficiary(t *testing.T) {
+	t.Skip("ApeChain: verkle trie support removed")
 	// The test txs were taken from a secondary testnet with chain id 69421
 	config := *testKaustinenLikeChainConfig
 	config.ChainID.SetUint64(69421)
@@ -1040,6 +1050,7 @@ func TestProcessVerkleSelfDestructInSameTxWithSelfBeneficiary(t *testing.T) {
 // it, but the beneficiary is the selfdestructed account. The difference with the test above,
 // is that the created account is prefunded and so the final value should be 0.
 func TestProcessVerkleSelfDestructInSameTxWithSelfBeneficiaryAndPrefundedAccount(t *testing.T) {
+	t.Skip("ApeChain: verkle trie support removed")
 	// The test txs were taken from a secondary testnet with chain id 69421
 	config := *testKaustinenLikeChainConfig
 	config.ChainID.SetUint64(69421)

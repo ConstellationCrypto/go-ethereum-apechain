@@ -734,15 +734,15 @@ func TestTinyTrie(t *testing.T) {
 	_, accounts := makeAccounts(5)
 	trie := NewEmpty(newTestDatabase(rawdb.NewMemoryDatabase(), rawdb.HashScheme))
 	trie.MustUpdate(common.Hex2Bytes("0000000000000000000000000000000000000000000000000000000000001337"), accounts[3])
-	if exp, root := common.HexToHash("8c6a85a4d9fda98feff88450299e574e5378e32391f75a055d470ac0653f1005"), trie.Hash(); exp != root {
+	if exp, root := common.HexToHash("7951b6f14c5d8615b961fdaf2083bb5d638350ea1e0add6be3dc79cf5fecb6b3"), trie.Hash(); exp != root {
 		t.Errorf("1: got %x, exp %x", root, exp)
 	}
 	trie.MustUpdate(common.Hex2Bytes("0000000000000000000000000000000000000000000000000000000000001338"), accounts[4])
-	if exp, root := common.HexToHash("ec63b967e98a5720e7f720482151963982890d82c9093c0d486b7eb8883a66b1"), trie.Hash(); exp != root {
+	if exp, root := common.HexToHash("5048bc8f2ec1bf820f495049898efa64e166c34e34b73e3cf4ac399e1dfca87d"), trie.Hash(); exp != root {
 		t.Errorf("2: got %x, exp %x", root, exp)
 	}
 	trie.MustUpdate(common.Hex2Bytes("0000000000000000000000000000000000000000000000000000000000001339"), accounts[4])
-	if exp, root := common.HexToHash("0608c1d1dc3905fa22204c7a0e43644831c3b6d3def0f274be623a948197e64a"), trie.Hash(); exp != root {
+	if exp, root := common.HexToHash("822cd7202a135647862d838b45229afd24e10c256fc85195e0b4b0d341280c79"), trie.Hash(); exp != root {
 		t.Errorf("3: got %x, exp %x", root, exp)
 	}
 	checktr := NewEmpty(newTestDatabase(rawdb.NewMemoryDatabase(), rawdb.HashScheme))
@@ -766,7 +766,7 @@ func TestCommitAfterHash(t *testing.T) {
 	trie.Hash()
 	trie.Commit(false)
 	root := trie.Hash()
-	exp := common.HexToHash("72f9d3f3fe1e1dd7b8936442e7642aef76371472d94319900790053c493f3fe6")
+	exp := common.HexToHash("b754d93ecf7853ee35c22b0902648b952b1c7db21f113da15a6197e2c5752139")
 	if exp != root {
 		t.Errorf("got %x, exp %x", root, exp)
 	}
@@ -804,7 +804,10 @@ func makeAccounts(size int) (addresses [][20]byte, accounts [][]byte) {
 		balance := new(uint256.Int).SetBytes(balanceBytes)
 		data, _ := rlp.EncodeToBytes(&types.StateAccount{
 			Nonce:    nonce,
-			Balance:  balance,
+			Flags:    types.YieldDisabled,
+			Fixed:    balance,
+			Shares:   new(uint256.Int),
+			Debt:     new(uint256.Int),
 			Root:     root,
 			CodeHash: code,
 		})
@@ -892,9 +895,9 @@ func TestCommitSequence(t *testing.T) {
 		count           int
 		expWriteSeqHash []byte
 	}{
-		{20, common.FromHex("330b0afae2853d96b9f015791fbe0fb7f239bf65f335f16dfc04b76c7536276d")},
-		{200, common.FromHex("5162b3735c06b5d606b043a3ee8adbdbbb408543f4966bca9dcc63da82684eeb")},
-		{2000, common.FromHex("4574cd8e6b17f3fe8ad89140d1d0bf4f1bd7a87a8ac3fb623b33550544c77635")},
+		{20, common.FromHex("52d62279c10b9efd5ea4ba6d8e64beb94bad10e2b688e480e2d8d4d5d20b1630")},
+		{200, common.FromHex("e7eb4631742a4976f3950f059dfdaeffe15739cf47aa4cf920cae5625f9bb421")},
+		{2000, common.FromHex("0ec6b1ee051c7e2b30a92b0317d82f531f4d62c58ad598628691c2092fcb5ec8")},
 	} {
 		addresses, accounts := makeAccounts(tc.count)
 

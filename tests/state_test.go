@@ -87,6 +87,7 @@ func TestLegacyState(t *testing.T) {
 
 // TestExecutionSpecState runs the test fixtures from execution-spec-tests.
 func TestExecutionSpecState(t *testing.T) {
+	t.Skip("ApeChain: execution spec fixtures use vanilla StateAccount format")
 	if !common.FileExist(executionSpecStateTestDir) {
 		t.Skipf("directory %s does not exist", executionSpecStateTestDir)
 	}
